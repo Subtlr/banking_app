@@ -24,6 +24,7 @@ void display_account(struct Account acc){
     {
         printf("-");
     }
+    printf("\n");
 }
 
 struct Account create_account(){
@@ -75,6 +76,8 @@ void deposit(struct Account *acc){
         if (deposit_buffer < 0)
         {
             printf("You can't deposit negative money, please use the withdrawal function. \n");
+        } else if (deposit_buffer > 99999) {
+            printf("You are trying to deposit too much money! \n");
         } else {
             printf("$%.2f successfully deposited into the account. \n", deposit_buffer);
             money_deposited = deposit_buffer;
@@ -82,11 +85,19 @@ void deposit(struct Account *acc){
         }
     }
     acc->balance += money_deposited;
-    printf("You now have $%f.", acc->balance);
+    printf("You now have $%f.\n", acc->balance);
 }
 
 void withdraw(struct Account *acc){
     float money_withdrawed = 0.0;
+    
+    if (acc->balance <= 0)
+    {
+        printf("You do not have any money.\n");
+        return;
+    }
+    
+    
     while (1)
     {
         float withdraw_buffer = 0;
@@ -95,16 +106,40 @@ void withdraw(struct Account *acc){
         if (!withdraw_buffer)
         {
             printf("\nSomething went wrong, please try again. \n");
-        } else if (withdraw_buffer < 0)
-        {
+        } else if (withdraw_buffer < 0) {
             printf("\nYou cannot withdraw negative money, please use the deposit function. \n");
             break;
-        } else
-        {
+        } else if (withdraw_buffer > acc->balance) {
+            printf("You do not have enough money to withdraw $%f\n", withdraw_buffer);
+        } else {
             money_withdrawed = withdraw_buffer;
             printf("\nSuccesfully withdrawed $%f \n", money_withdrawed);
             acc->balance -= money_withdrawed;
             break;
         }
     }
+}
+
+void program_loop(){
+    printf("Welcome to fiuk bank! Please create an account.\n");
+    struct Account acc = create_account();
+    while (1)
+    {
+        printf("Current account: %s\n", acc.account_name);
+        printf("What would you like to do? \n1) Check account; \n2) Withdraw; \n3) Deposit. \nType in the number of the action you want to do: ");
+        int choice;
+        scanf("%d", &choice);
+        switch (choice)
+        {
+        case 1:
+            display_account(acc);
+            break;
+        case 2:
+            withdraw(&acc);
+            break;
+        case 3:
+        deposit(&acc);
+        break;
+        }   
+    }   
 }
